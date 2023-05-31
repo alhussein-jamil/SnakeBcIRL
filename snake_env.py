@@ -4,6 +4,7 @@ import pygame
 import random 
 import gymnasium as gym
 import numpy as np
+import torch
 
 import gymnasium.utils as utils 
 
@@ -21,12 +22,15 @@ class SnakeEnv(gym.Env):
         self.snake = Snake(self.screen_width, self.screen_height, self.block_size)
         self.apple = self.generate_apple()
         self.latest_distance = 1
-        self.max_steps = config.get('max_steps', self.screen_width * self.screen_height // self.block_size**2)
-        if(config.get('render_mode',"rgb_array") == "human"):
+        self.max_steps = config.get('max_steps', 2*self.screen_width * self.screen_height // self.block_size**2)
+        self.render_mode = config.get('render_mode',"rgb_array")
+        if(self.render_mode == "human"):
             pygame.init()
             self.screen =  pygame.display.set_mode((self.screen_width, self.screen_height))
+
         #self.observation_space = Box(low=0, high=1, shape=(self.screen_height//self.block_size*self.screen_width//self.block_size* 3,), dtype=np.uint8)
-        self.observation_space = Box(low = 0, high = 1, shape = (self.screen_height//self.block_size, self.screen_width//self.block_size, 3,), dtype = np.float32)
+        #self.observation_space = Box(low = 0, high = 1, shape = (self.screen_height//self.block_size, self.screen_width//self.block_size, 3,), dtype = np.float32)
+        self.observation_space = Box(low = 0 , high = 1 , shape =  ((1+ self.screen_width* self.screen_height // (self.block_size**2)  )*2,) , dtype = np.float32)
         self.action_space = Box(low = 0, high = 1, shape = (4,), dtype = np.float32)
         self.hunger = 0
         self.steps = 0
@@ -43,7 +47,7 @@ class SnakeEnv(gym.Env):
             # "getting closer": 1 if self.latest_distance > self.normalized_distance(self.snake.head, self.apple.position) else -2,
 
         }
-        return( rewards["apple"] + rewards["death"] ) 
+        self.reward = rewards["apple"] + rewards["death"]
         # self.latest_distance = self.normalized_distance(self.snake.head, self.apple.position)
         # self.reward =( rewards["getting closer"] + rewards["apple"] + rewards["death"] ) / len(rewards)
         # self.reward = np.clip(self.reward,0,1)
@@ -66,6 +70,7 @@ class SnakeEnv(gym.Env):
         self.score = 0
         self.done = False
         self.reward = 0
+        self.steps = 0
         # Return the initial observation of the game state
         return self._get_obs(), {}
 
@@ -77,7 +82,7 @@ class SnakeEnv(gym.Env):
         # Move snake
         self.snake.move()
         self.compute_reward(action)
-        
+        self.steps += 1
         self.hunger += 1
 
         if self.snake.head == self.apple.position:
@@ -97,7 +102,7 @@ class SnakeEnv(gym.Env):
         if self.steps > self.max_steps:
             self.done = True
 
-        return self._get_obs(),self.reward, self.done, False, {}
+        return self._get_obs(),self.reward, self.done, {}
     
     # Make a random apple
     def generate_apple(self):
@@ -142,21 +147,21 @@ class SnakeEnv(gym.Env):
     def in_grid_bounds(self, pos):
         return 0 <= pos[0] < self.screen_width and 0 <= pos[1] < self.screen_height
     
-    def _get_obs(self):
-        obs = np.zeros((self.screen_height//self.block_size, self.screen_width//self.block_size, 3), dtype=np.uint8)
-        obs[self.apple.position[1]//self.block_size, self.apple.position[0]//self.block_size, 0] = 1
+    # def _get_obs(self):
+    #     obs = np.zeros((self.screen_height//self.block_size, self.screen_width//self.block_size, 3), dtype=np.uint8)
+    #     obs[self.apple.position[1]//self.block_size, self.apple.position[0]//self.block_size, 0] = 1
         
-        for pos in self.snake.body[:-1]:
-            if(self.in_grid_bounds(pos)):
-                obs[pos[1]//self.block_size, pos[0]//self.block_size, 1] = 1
-        if(self.in_grid_bounds(self.snake.head)):
-            obs[self.snake.head[1]//self.block_size, self.snake.head[0]//self.block_size, 2] = 1
-        return obs
+    #     for pos in self.snake.body[:-1]:
+    #         if(self.in_grid_bounds(pos)):
+    #             obs[pos[1]//self.block_size, pos[0]//self.block_size, 1] = 1
+    #     if(self.in_grid_bounds(self.snake.head)):
+    #         obs[self.snake.head[1]//self.block_size, self.snake.head[0]//self.block_size, 2] = 1
+    #     return obs
     
 
     
     def _get_obs(self):
-        obs = np.zeros((1+ self.screen_width* self.screen_height // (self.block_size**2)  )*2, dtype=np.float32)
+        obs = torch.zeros((1+ self.screen_width* self.screen_height // (self.block_size**2)  )*2, dtype=torch.float32)
         obs[0] = self.apple.position[0]/ self.screen_width
         obs[1] = self.apple.position[1]/ self.screen_height
         for i in range(len(self.snake.body)):
