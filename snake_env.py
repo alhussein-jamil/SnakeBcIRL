@@ -153,3 +153,13 @@ class SnakeEnv(gym.Env):
             obs[self.snake.head[1]//self.block_size, self.snake.head[0]//self.block_size, 2] = 1
         return obs
     
+
+    
+    def _get_obs(self):
+        obs = np.zeros((1+ self.screen_width* self.screen_height // (self.block_size**2)  )*2, dtype=np.float32)
+        obs[0] = self.apple.position[0]/ self.screen_width
+        obs[1] = self.apple.position[1]/ self.screen_height
+        for i in range(len(self.snake.body)):
+            obs[2*i+2] = self.snake.body[i][0]/ self.screen_width
+            obs[2*i+3] = self.snake.body[i][1]/ self.screen_height
+        return obs
