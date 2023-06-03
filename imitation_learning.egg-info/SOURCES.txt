@@ -20,6 +20,7 @@ imitation_learning/common/evaluator.py
 imitation_learning/common/plotting.py
 imitation_learning/common/pointmass_utils.py
 imitation_learning/common/rewards.py
+imitation_learning/common/snake_utils.py
 imitation_learning/common/utils.py
 imitation_learning/policy_opt/__init__.py
 imitation_learning/policy_opt/policy.py

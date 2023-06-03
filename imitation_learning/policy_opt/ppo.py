@@ -120,7 +120,7 @@ class PPO(nn.Module):
                     + action_loss
                     - ac_eval["dist_entropy"].mean() * self.entropy_coef
                 )
-                
+
                 if isinstance(optimizer, DifferentiableOptimizer):
                     optimizer.step(loss)
                 else:
@@ -145,9 +145,11 @@ class PPO(nn.Module):
         value_preds,
         last_value,
     ):
+
         gae = 0
         n_envs, n_steps, _ = rewards.shape
         returns = torch.zeros(n_envs, n_steps, 1)
+
         for step in reversed(range(n_steps)):
             if step == n_steps - 1:
                 next_val = last_value
@@ -159,7 +161,11 @@ class PPO(nn.Module):
                 + self.gamma * next_val * masks[:, step].view(-1,1)
                 - value_preds[:, step]
             )
+
+
             gae = delta + self.gamma * self.gae_lambda * masks[:, step].view(-1,1) * gae
+
+
             returns[:, step] = gae + value_preds[:, step]
 
         advantages = returns - value_preds

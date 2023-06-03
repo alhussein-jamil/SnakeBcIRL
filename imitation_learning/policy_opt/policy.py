@@ -188,7 +188,6 @@ class Policy(nn.Module):
         }
 
     def forward(self, td):
-
         return self.hidden(td)
 
     def get_action_dist(self, td):
@@ -199,24 +198,22 @@ class Policy(nn.Module):
     def act(self, td, deterministic=False):
         hidden_td = self.forward(td)
         critic_td = self.critic(td)
-
         critic_value = critic_td["state_value"]
 
         dist, _ = self.actor.get_dist(td)
+
         if deterministic:
             action = dist.mode
-    
         else:
             action = dist.sample()
 
         action_log_probs = dist.log_prob(action)
-
         dist_entropy = dist.entropy()
 
-        # if hidden_td.get("recurrent_hidden_states", None) is None:
-        #     td["recurrent_hidden_states"] = torch.zeros(
-        #         self.num_envs, self.recurrent_hidden_size
-        #     )
+        if hidden_td.get("recurrent_hidden_states", None) is None:
+            td["recurrent_hidden_states"] = torch.zeros(
+                self.num_envs, self.recurrent_hidden_size
+            )
 
         td["action"] = action.long() if self.action_is_discrete else action
         td["sample_log_prob"] = action_log_probs

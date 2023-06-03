@@ -34,7 +34,7 @@ def set_seed(seed: int) -> None:
 
 @hydra.main(config_path="config", config_name="default")
 def main(cfg) -> Dict[str, float]:
-
+    print(cfg)
     set_seed(cfg.seed)
 
     device = torch.device(cfg.device)
@@ -54,7 +54,7 @@ def main(cfg) -> Dict[str, float]:
 
     steps_per_update = cfg.num_steps * cfg.num_envs
     num_updates = int(cfg.num_env_steps) // steps_per_update
-    print(num_updates)
+
     # Set dynamic variables in the config.
     cfg.obs_shape = envs.observation_space.shape
     cfg.action_dim = envs.action_space.shape[0]
@@ -64,16 +64,15 @@ def main(cfg) -> Dict[str, float]:
     logger: Logger = hydra_instantiate(cfg.logger, full_cfg=cfg)
     policy = hydra_instantiate(cfg.policy)
     policy = policy.to(device)
-    print(cfg.policy_updater.inner_opt)
     updater = hydra_instantiate(cfg.policy_updater, policy=policy, device=device)
-    # evaluator: Evaluator = hydra_instantiate(
-    #     cfg.evaluator,
-    #     envs=envs,
-    #     vid_dir=logger.vid_path,
-    #     updater=updater,
-    #     logger=logger,
-    #     device=device,
-    # )
+    evaluator: Evaluator = hydra_instantiate(
+        cfg.evaluator,
+        envs=envs,
+        vid_dir=logger.vid_path,
+        updater=updater,
+        logger=logger,
+        device=device,
+    )
 
     start_update = 0
     if cfg.load_checkpoint is not None:
@@ -90,7 +89,7 @@ def main(cfg) -> Dict[str, float]:
 
     if cfg.only_eval:
         # Evaluate the policy and end.
-        # eval_result = evaluator.evaluate(policy, cfg.num_eval_episodes, 0)
+        eval_result = evaluator.evaluate(policy, cfg.num_eval_episodes, 0)
         logger.collect_infos(eval_result, "eval.", no_rolling_window=True)
         eval_info.update(eval_result)
         logger.interval_log(0, 0)
@@ -99,7 +98,6 @@ def main(cfg) -> Dict[str, float]:
         return eval_info
 
     obs = envs.reset()
-    print(obs.dtype)
     td = TensorDict({"observation": obs}, batch_size=[cfg.num_envs])
     # Storage for the rollouts
     storage_td = TensorDict({}, batch_size=[cfg.num_envs, cfg.num_steps], device=device)
@@ -121,9 +119,6 @@ def main(cfg) -> Dict[str, float]:
 
             storage_td[:, step_idx] = td
             td["observation"] = next_obs
-
-            for key,value in td.items():
-                print(key,value.shape)
             # Log to CLI/wandb.
             logger.collect_env_step_info(infos)
 

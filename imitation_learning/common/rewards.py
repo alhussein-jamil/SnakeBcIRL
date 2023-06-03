@@ -28,7 +28,6 @@ class NeuralReward(nn.Module):
         reward_type=None,
         clamp_max=None,
     ):
-
         if reward_type is None:
             reward_type = RewardInputType.NEXT_STATE
         super().__init__()

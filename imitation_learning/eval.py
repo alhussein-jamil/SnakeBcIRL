@@ -14,7 +14,7 @@ def run_and_eval(cfg):
     """
     Helper script for training a policy from scratch on a learned reward function.
     """
-    print(cfg)
+
     eval_cfg = OmegaConf.merge(cfg, cfg.eval_args)
     eval_cfg.load_policy = False
     assert eval_cfg.load_checkpoint != "" and eval_cfg.load_checkpoint is not None

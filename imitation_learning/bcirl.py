@@ -47,7 +47,6 @@ class BCIRL(nn.Module):
         force_num_env_steps_lr_decay: float = -1.0,
         **kwargs,
     ):
-        print(batch_size, num_steps, num_envs)
         super().__init__()
         self.inner_updater = instantiate(inner_updater)
         self.reward = instantiate(reward).to(device)
@@ -163,6 +162,7 @@ class BCIRL(nn.Module):
 
                 # Inner loop policy update
                 self.inner_updater.update(dpolicy, rollouts, logger, diffopt)
+
                 if inner_i != self.n_inner_iters - 1:
                     # Additional inner loop policy updates (if n_inner_iters > 1)
                     td = rollouts[:, -1]
