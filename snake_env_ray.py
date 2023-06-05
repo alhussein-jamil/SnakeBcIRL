@@ -47,7 +47,7 @@ class SnakeEnv(gym.Env):
         #self.observation_space = Box(low=0, high=1, shape=(self.screen_height//self.block_size*self.screen_width//self.block_size* 3,), dtype=np.uint8)
         #self.observation_space = Box(low = 0, high = 1, shape = (self.screen_height//self.block_size, self.screen_width//self.block_size, 3,), dtype = np.float32)
         self.observation_space = Box(low = -0.5 , high = 1 , shape =  ((1+ self.screen_width* self.screen_height // (self.block_size**2)  )*2,) , dtype = np.float32)
-        #self.observation_space = Box(low = -0.5 , high = 1 , shape =  (4,) , dtype = np.float32)
+        self.observation_space = Box(low = -0.5 , high = 1 , shape =  (4,) , dtype = np.float32)
         # self.observation_space = Box(low = -0.5 , high = 1 , shape =  (4,) , dtype = np.float32)
         
         

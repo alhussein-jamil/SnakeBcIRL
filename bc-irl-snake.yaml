@@ -134,15 +134,15 @@ obs_shape: ???
 action_dim: ???
 total_num_updates: ???
 action_is_discrete: ???
-num_steps: 25
+num_steps: 50
 num_envs: 256
 device: cpu
 only_eval: false
 seed: 3
 num_eval_episodes: 100
-num_env_steps: 5000000
+num_env_steps: 50000000
 recurrent_hidden_state_size: 128
-gamma: 0.99
+gamma: 0.8
 log_interval: 10
 eval_interval: 500
 save_interval: 10000000000
@@ -151,7 +151,7 @@ load_policy: true
 resume_training: false
 policy:
     _target_: imitation_learning.policy_opt.policy.Policy
-    hidden_size: 128
+    hidden_size: 512
     recurrent_hidden_size: 128
     is_recurrent: false
     obs_shape: ${obs_shape}

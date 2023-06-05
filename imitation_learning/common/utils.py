@@ -66,6 +66,9 @@ def get_dataset_data(dataset_path: str, env_name: str):
     dataset["terminals"] = torch.tensor(dataset["terminals"],dtype = torch.bool)
     dataset["next_observations"] = torch.tensor(dataset["next_observations"],dtype = torch.float32)
     dataset["infos"] = [{} for _ in range(dataset["observations"].shape[0])]
+    for key in dataset.keys():
+        print(key)
+        print(len(dataset[key]))
     return create_next_obs(dataset)
 
 
