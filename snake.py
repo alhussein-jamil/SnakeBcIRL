@@ -1,6 +1,5 @@
 import pygame 
 import numpy as np 
-
 class Snake:
     def __init__(self, screen_width, screen_height, block_size):
         self.head = (0, 0)

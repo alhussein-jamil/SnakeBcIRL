@@ -47,7 +47,8 @@ class SnakeEnv(gym.Env):
         #self.observation_space = Box(low=0, high=1, shape=(self.screen_height//self.block_size*self.screen_width//self.block_size* 3,), dtype=np.uint8)
         #self.observation_space = Box(low = 0, high = 1, shape = (self.screen_height//self.block_size, self.screen_width//self.block_size, 3,), dtype = np.float32)
         self.observation_space = Box(low = -0.5 , high = 1 , shape =  ((1+ self.screen_width* self.screen_height // (self.block_size**2)  )*2,) , dtype = np.float32)
-        self.observation_space = Box(low = -0.5 , high = 1 , shape =  (4,) , dtype = np.float32)
+        #self.observation_space = Box(low = -0.5 , high = 1 , shape =  (4,) , dtype = np.float32)
+        # self.observation_space = Box(low = -0.5 , high = 1 , shape =  (4,) , dtype = np.float32)
         
         
         self.action_space = Box(low = 0, high = 1, shape = (4,), dtype = np.float32)
@@ -66,7 +67,7 @@ class SnakeEnv(gym.Env):
             "getting_closer": 1.0 if self.latest_distance  > self.normalized_distance(self.snake.head, self.apple.position) else -2.0,
             "normalized_distance": 1.0-(self.normalized_distance(self.snake.head, self.apple.position))**0.25
         }
-        self.reward = rewards['death'] + rewards["apple"]  + (rewards["normalized_distance"] if self.latest_distance  > self.normalized_distance(self.snake.head, self.apple.position) else -0.2)/20.0
+        self.reward = rewards['death'] + rewards["apple"]  + (rewards["normalized_distance"] if self.latest_distance  > self.normalized_distance(self.snake.head, self.apple.position) else -1.1)/10.0
         #self.reward =  rewards['death'] + rewards["apple"]  + (rewards["normalized_distance"] if self.latest_distance  > self.normalized_distance(self.snake.head, self.apple.position) else -1.0)
         self.latest_distance = self.normalized_distance(self.snake.head, self.apple.position)
         

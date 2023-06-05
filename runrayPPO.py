@@ -37,10 +37,10 @@ configs = yaml.safe_load(open("SnakeDeepQ.yaml"))["env"]
 trainer= PPOConfig().from_dict({"callbacks": MyCallbacks, "observation_filter" : "MeanStdFilter" })
 
 trainer = trainer.environment(env = "snake-v0", env_config=configs)\
-                     .resources(num_gpus=0, num_cpus_per_worker=1)\
+                     .resources(num_gpus=1, num_cpus_per_worker=1)\
                      .rollouts(num_rollout_workers=16, recreate_failed_workers= True )\
                      .training(clip_param= 0.3,gamma = 0.99 , kl_coeff = 0.3,model ={
-  'fcnet_hiddens' : [64, 64],
+  'fcnet_hiddens' : [2048, 2048],
   'fcnet_activation': 'swish',
   'vf_share_layers': False,
   'free_log_std': True }, train_batch_size= 5000 ,sgd_minibatch_size = 1000,num_sgd_iter= 5

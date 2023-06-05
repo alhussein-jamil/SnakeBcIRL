@@ -13,7 +13,7 @@ from gymnasium.spaces import Discrete, Box
 
 class SnakeEnv(gym.Env):
     metadata = {'render.modes': ['human', 'rgb_array']}
-    def __init__(self,config,  **kwargs):
+    def __init__(self,config, **kwargs):
         utils.EzPickle.__init__(self, config, **kwargs)
         self.screen_width = config.get('screen_width', 300)
         self.screen_height = config.get('screen_height', 300)
@@ -54,10 +54,11 @@ class SnakeEnv(gym.Env):
             "getting_closer": 1.0 if self.latest_distance  > self.normalized_distance(self.snake.head, self.apple.position) else -2.0,
             "normalized_distance": 1.0-(self.normalized_distance(self.snake.head, self.apple.position))**0.25
         }
-        self.reward = rewards['death'] + rewards["apple"]  + (rewards["normalized_distance"] if self.latest_distance  > self.normalized_distance(self.snake.head, self.apple.position) else -0.2)/20.0
+        self.reward = rewards['death'] + rewards["apple"]  + (rewards["normalized_distance"] if self.latest_distance  > self.normalized_distance(self.snake.head, self.apple.position) else -1.1)/10.0
         #self.reward =  rewards['death'] + rewards["apple"]  + (rewards["normalized_distance"] if self.latest_distance  > self.normalized_distance(self.snake.head, self.apple.position) else -1.0)
         self.latest_distance = self.normalized_distance(self.snake.head, self.apple.position)
         
+
 
     def reset(self, iteration=0, seed=None, options=None):
         # This function resets the game state and returns the initial observation
@@ -183,7 +184,7 @@ class SnakeEnv(gym.Env):
 
     
     def _get_obs(self):
-        obs = np.zeros((1+ self.screen_width* self.screen_height // (self.block_size**2)  )*2, dtype=np.float32)
+        obs = torch.zeros((1+ self.screen_width* self.screen_height // (self.block_size**2)  )*2, dtype=torch.float32)
         obs[0] = self.apple.position[0]/ self.screen_width
         obs[1] = self.apple.position[1]/ self.screen_height
         for i in range(len(self.snake.body)-1,-1,-1):
